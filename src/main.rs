@@ -40,13 +40,20 @@ impl File {
 }
 
 fn classify_file_type(extension: &String) -> Filetype {
+    use Filetype::*;
+    let img_extensions = [".jpg", ".png", ".gif", ".bmp", ".svg"];
+    let doc_extensions = [".pdf", ".docx", ".txt", ".md"];
+    let video_extensions = [".mp4", ".avi", ".mkv", ".mov"];
+    let audio_extensions = [".mp3", ".wav", ".flac"];
+    let archive_extensions = [".zip", ".rar", ".tar", ".gz"];
+
     match extension.to_lowercase().as_str() {
-        ".jpg" | ".png" | ".gif" | ".bmp" | ".svg" => Filetype::Images,
-        ".pdf" | ".docx" | ".txt" | ".md" => Filetype::Documents,
-        ".mp4" | ".avi" | ".mkv" | ".mov" => Filetype::Video,
-        ".mp3" | ".wav" | ".flac" => Filetype::Audio,
-        ".zip" | ".rar" | ".tar" | ".gz" => Filetype::Archives,
-        _ => Filetype::Others,
+        ext if img_extensions.contains(&ext) => Images,
+        ext if doc_extensions.contains(&ext) => Documents,
+        ext if video_extensions.contains(&ext) => Video,
+        ext if audio_extensions.contains(&ext) => Audio,
+        ext if archive_extensions.contains(&ext) => Archives,
+        _ => Others,
     }
 }
 

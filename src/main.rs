@@ -40,7 +40,6 @@ impl File {
 }
 
 fn classify_file_type(extension: &String) -> Filetype {
-    use Filetype::*;
     let img_extensions = [".jpg", ".png", ".gif", ".bmp", ".svg"];
     let doc_extensions = [".pdf", ".docx", ".txt", ".md"];
     let video_extensions = [".mp4", ".avi", ".mkv", ".mov"];
@@ -48,12 +47,12 @@ fn classify_file_type(extension: &String) -> Filetype {
     let archive_extensions = [".zip", ".rar", ".tar", ".gz"];
 
     match extension.to_lowercase().as_str() {
-        ext if img_extensions.contains(&ext) => Images,
-        ext if doc_extensions.contains(&ext) => Documents,
-        ext if video_extensions.contains(&ext) => Video,
-        ext if audio_extensions.contains(&ext) => Audio,
-        ext if archive_extensions.contains(&ext) => Archives,
-        _ => Others,
+        ext if img_extensions.contains(&ext) => Filetype::Images,
+        ext if doc_extensions.contains(&ext) => Filetype::Documents,
+        ext if video_extensions.contains(&ext) => Filetype::Video,
+        ext if audio_extensions.contains(&ext) => Filetype::Audio,
+        ext if archive_extensions.contains(&ext) => Filetype::Archives,
+        _ => Filetype::Others,
     }
 }
 
@@ -129,19 +128,21 @@ fn main() -> ExitCode {
             Filetype::Others => others.push(file),
         }
     }
+
+    let file_classes = [
+        ("Images", &images),
+        ("Documents", &documents),
+        ("Video", &video),
+        ("Audio", &audio),
+        ("Archives", &archives),
+        ("Others", &others),
+    ];
+
     if flag == "dry-run" {
         println!("Expected Output:");
         println!("{}", path);
-        let file_classes = [
-            (Filetype::Images, "Images", &images),
-            (Filetype::Documents, "Documents", &documents),
-            (Filetype::Video, "Video", &video),
-            (Filetype::Audio, "Audio", &audio),
-            (Filetype::Archives, "Archives", &archives),
-            (Filetype::Others, "Others", &others),
-        ];
 
-        for (_, folder_name, files) in file_classes.iter() {
+        for (folder_name, files) in file_classes.iter() {
             match files.is_empty() {
                 false => {
                     println!("  |--{}", folder_name);
@@ -157,16 +158,8 @@ fn main() -> ExitCode {
 
     if flag == "organize" {
         println!("Organizing files in: {}", path);
-        let file_classes = [
-            (Filetype::Images, "Images", &images),
-            (Filetype::Documents, "Documents", &documents),
-            (Filetype::Video, "Video", &video),
-            (Filetype::Audio, "Audio", &audio),
-            (Filetype::Archives, "Archives", &archives),
-            (Filetype::Others, "Others", &others),
-        ];
 
-        for (_, folder_name, files) in file_classes.iter() {
+        for (folder_name, files) in file_classes.iter() {
             if !files.is_empty() {
                 match fs::create_dir_all(format!("{}/{}", path, folder_name)) {
                     Ok(_) => {
